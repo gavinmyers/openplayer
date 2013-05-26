@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" verticalAlign="middle" horizontalGap="0" initialize="init()">
+
+<mx:Script>
+	<![CDATA[
+		import com.openplayer.MP3Player;
+		import mx.events.FlexEvent;
+		import mx.containers.VBox;
+		import mx.containers.Accordion;
+		import mx.collections.ArrayCollection;
+		import mx.rpc.events.ResultEvent;
+		import com.openplayer.ProfileManager;
+		import com.openplayer.ArchiveManager;
+		import com.openplayer.SearchResult;
+		import com.openplayer.FileResult;
+		import com.openplayer.MP3PlayerManager;
+		import com.openplayer.Images;
+			
+		[Bindable]
+		public var _FileResult:FileResult;
+		
+		[Bindable]
+		public var _MP3Player:MP3Player;
+		
+		[Bindable]
+		public var isDragging:Boolean = false;
+		
+		[Bindable]
+		public var _Timer:Timer = new Timer(1000);
+		
+		
+		public function init() {
+
+			MP3PlayerManager.listen("PLAY", gplay);
+			MP3PlayerManager.listen("STOP", gstop);
+			MP3PlayerManager.listen(Event.SOUND_COMPLETE, soundComplete);
+			_Timer.addEventListener("timer", value);
+		}
+
+	      public function gplay(event:Event):void {
+	      	this._FileResult = MP3PlayerManager.getMP3Player()._FileResult;
+	      	this._MP3Player = MP3PlayerManager.getMP3Player();
+	      	this.eventPlay(new Event("PLAY"));
+	      }
+	      
+	      public function gstop(event:Event):void {
+	      	//this._FileResult = MP3PlayerManager.getMP3Player()._FileResult;
+	      	this.eventStop(new Event("STOP"));
+	      }
+	      
+		public function value(event:Event) {
+			if(isDragging == false && _MP3Player.isPlaying == true) 
+			{ 
+				this.slider.value = (_MP3Player.position / _MP3Player.length) * 100;
+			}
+			
+		}
+		
+		public function stop() {
+			MP3PlayerManager.stop();
+		}
+				
+		public function play() {
+			if(this._FileResult == null) {
+				return;
+			}
+			MP3PlayerManager.play(this._FileResult);
+		}
+		
+		public function eventPlay(event:Event) {
+			this.istop.visible = true;
+			this.iplay.visible = false;
+			this.slider.enabled = true;
+			_Timer.start();
+		}
+		
+		public function eventStop(event:Event) {
+			this.istop.visible = false;
+			this.iplay.visible = true;
+			this.slider.enabled = false;
+			_Timer.stop();
+		}
+		
+		public function dragComplete() {
+			this.isDragging = false;
+			//value="{(_MP3Player.position / _MP3Player.length) * 115}"
+			var p:Number =  this.slider.value / 100;
+			var v:Number = 0;
+			v = _MP3Player.length * p;
+			v = Math.floor(v);
+
+			MP3PlayerManager.playAt(_MP3Player, v);
+			
+			this.istop.visible = true;
+			this.iplay.visible = false;	
+			this.slider.enabled = true;
+		}
+		
+		public function soundComplete(event:Event) {
+			if(MP3PlayerManager.getMP3Player() == null) {
+				return;
+			}
+			if(_FileResult != MP3PlayerManager.getMP3Player()._FileResult) {
+				return;
+			}
+			_Timer.stop();
+			this.slider.value = 0;
+		}
+		
+	]]>
+</mx:Script>
+
+
+
+	<mx:Canvas width="20">
+		<mx:Image id="istop" source="{Images.music_stop}" visible="false" click="stop()" useHandCursor="true" buttonMode="true"/>
+		<mx:Image id="iplay" source="{Images.music_play}" click="play()" useHandCursor="true" buttonMode="true"/>
+	</mx:Canvas>
+	<mx:Canvas width="620">
+		<mx:HSlider useHandCursor="true"
+			sliderThumbClass="{com.openplayer.FlexibleSliderThumb}" 
+			thumbSkin="{Images.music_thumb}" 
+			showTrackHighlight="true" 
+			showDataTip="false" 
+			enabled="false" 
+			id="slider" 
+			top="-3" 
+			minimum="0" 
+			maximum="100" 
+			width="620"
+			thumbPress="{isDragging=true}" 
+			thumbRelease="dragComplete()" />
+	</mx:Canvas>
+	<mx:Image source="{Images.music_previous}"/>
+	<mx:Image source="{Images.music_next}"/>
+</mx:HBox>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas initialize="creation()" xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*">
+	<mx:Script>
+		<![CDATA[
+			import com.openplayer.MP3PlayerManager;
+			import mx.effects.Fade;
+			import mx.events.CollectionEvent;
+			import mx.events.FlexEvent;
+			import mx.containers.VBox;
+			import mx.containers.Accordion;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import com.openplayer.ProfileManager;
+			import com.openplayer.ArchiveManager;
+			import com.openplayer.SearchResult;
+			import com.openplayer.FileResult;
+			import com.openplayer.PlaylistManager;
+			import com.openplayer.Images;
+
+			
+			[Bindable]
+			public var _FileResult:FileResult;
+			
+			[Bindable]
+			public var _SearchResult:SearchResult;
+			
+
+			
+			public function creation() {
+				
+			}
+			
+			
+			public function remove() {
+				PlaylistManager._Files.removeItemAt(PlaylistManager._Files.getItemIndex(this._FileResult));
+			}
+
+		]]>
+	</mx:Script>
+
+
+	
+	<mx:HBox width="100%">
+		<mx:Text fontWeight="bold" text="{_SearchResult.title}" width="150"/>
+		<mx:Text text=" - "/>
+		<mx:Text text="{_FileResult.title}" width="150"/>
+		<local:SmallMusicPlayer id="smallMusicPlayer" _FileResult="{_FileResult}"/>
+		<mx:Canvas width="20" height="20">
+			<mx:Image visible="true" source="{Images.list_remove}" id="list_add" click="remove()" useHandCursor="true" buttonMode="true"/>
+		</mx:Canvas>
+		<local:SongRating/>
+
+	</mx:HBox>
+</mx:Canvas>

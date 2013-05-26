@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*" initialize="init()" width="100%">
+	<mx:Script>
+		<![CDATA[
+			import com.openplayer.MP3PlayerManager;
+			import mx.events.CollectionEvent;
+			import mx.events.FlexEvent;
+			import mx.containers.VBox;
+			import mx.containers.Accordion;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import com.openplayer.ProfileManager;
+			import com.openplayer.ArchiveManager;
+			import com.openplayer.SearchResult;
+			import com.openplayer.FileResult;
+			import com.openplayer.PlaylistManager;
+			
+			public function init() {
+				MP3PlayerManager.listen(Event.SOUND_COMPLETE, soundComplete);
+
+			}
+						
+
+			public function soundComplete(event:Event) {
+				if(PlaylistManager.IsPlaying) {
+					//go on to the next song
+					if(PlaylistManager._Files.contains(MP3PlayerManager.getMP3Player()._FileResult)) {
+						var index:Number = PlaylistManager._Files.getItemIndex(MP3PlayerManager.getMP3Player()._FileResult);
+
+						index = index + 1;
+						if(index >= PlaylistManager._Files.length) {
+							index = 0;
+						}
+						var file:FileResult = PlaylistManager._Files.getItemAt(index) as FileResult;
+						MP3PlayerManager.play(file);
+						
+					}
+				}
+			}
+		]]>
+	</mx:Script>
+	
+
+	<mx:List rowCount="{PlaylistManager._Files.length}" id="list" width="100%" backgroundAlpha="0" borderThickness="0" verticalScrollPolicy="off" selectable="false" rowHeight="35" dataProvider="{PlaylistManager._Files}">
+	  <mx:itemRenderer>
+	      <mx:Component>
+	          <local:FileResultViewPlaylist _FileResult="{data as FileResult}" _SearchResult="{(data as FileResult)._SearchResult}"/>
+	      </mx:Component>
+	  </mx:itemRenderer>
+	</mx:List>
+	
+</mx:Canvas>

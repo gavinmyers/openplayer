@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	backgroundColor="#FFFFFF" 
+	xmlns:local="*" applicationComplete="complete()" 
+	initialize="init()">
+<mx:Canvas>
+	<mx:Image source="{Images.background}" top="10" left="7"/>
+	<local:MusicPlayer top="106" left="43"/>	
+	<local:SongInformation top="34" left="43"/>
+	<local:Content id="content" top="136" left="43"/>
+	
+     <mx:List visible="false" id="dg" rowCount="{(dg.dataProvider as ArrayCollection).length}"
+      	width="100%" 
+      	verticalScrollPolicy="off">
+      </mx:List >
+
+</mx:Canvas>
+
+<mx:Script>
+	<![CDATA[
+		import com.openplayer.ApplicationManager;
+		import mx.collections.ArrayCollection;
+		import mx.rpc.events.ResultEvent;
+		import com.openplayer.ProfileManager;
+		import com.openplayer.ArchiveManager;
+		import com.openplayer.Images;
+		
+		
+		private function init():void {
+			ApplicationManager._Content = this.content;
+			
+		}
+		private function complete():void {
+			stage.focus=this;
+			stage.addEventListener(KeyboardEvent.KEY_UP, handleKeyUp);
+		}
+			
+		public function handleKeyUp(event:KeyboardEvent) :void
+		{
+			trace("Key was pressed: " + event.keyCode);
+		}
+
+
+	]]>
+</mx:Script>
+</mx:Application>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.containers.VBox;
+			import mx.containers.Accordion;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import com.openplayer.ProfileManager;
+			import com.openplayer.ArchiveManager;
+			import com.openplayer.SearchResult;
+			
+
+			
+			[Bindable]
+			public var _SearchResult:SearchResult;
+			
+			public function details() {
+				var event:Event = new Event("ARTIST_DETAILS");
+				this.dispatchEvent(event);
+			}
+			
+		]]>
+	</mx:Script>
+	<mx:VBox verticalGap="0">
+		<mx:HBox verticalAlign="middle" height="29">
+			<mx:Canvas width="5"/>
+			<mx:HBox width="525" verticalAlign="middle">
+				<mx:Text htmlText="{_SearchResult.title}" width="100" maxHeight="30"/>
+				<mx:Text htmlText="{_SearchResult.description}" width="375" maxHeight="30"/>
+			</mx:HBox>
+			<mx:Button label="...more" click="details()"/>
+			<mx:Canvas width="5"/>
+		</mx:HBox>
+	</mx:VBox>
+</mx:Canvas>

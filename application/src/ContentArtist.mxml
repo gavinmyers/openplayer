@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*" initialize="init()">
+<mx:Script>
+	<![CDATA[
+			import com.openplayer.ApplicationManager;
+			import mx.events.FlexEvent;
+			import mx.containers.VBox;
+			import mx.containers.Accordion;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import com.openplayer.ProfileManager;
+			import com.openplayer.ArchiveManager;
+			import com.openplayer.SearchResult;
+			import com.openplayer.FileResult;
+			
+			[Bindable]
+			public var _SearchResult:SearchResult;
+			      
+	      public function init() {
+	      	this.vbox.visible = false;
+	      	if(this._SearchResult == null) {
+	      		return;
+	      	}
+	      	if(this._SearchResult.fileResults.length == 0) {
+	      		var am:ArchiveManager = new ArchiveManager();
+	      		am.listen("DETAIL_RESULT", detailResponse);
+	      		am.details(this._SearchResult);
+	      	} else {
+	      		response(this._SearchResult.fileResults);
+	      	}
+	      }
+	      
+		public function detailResponse(event:ResultEvent):void {
+			response(event.result as ArrayCollection);
+		}
+		
+		public function response(playItems:ArrayCollection) {
+			
+
+			
+			this.fileList.read(this._SearchResult, playItems);		
+			this._SearchResult.fileResults = playItems;
+			this.vbox.visible = true;
+		}
+		
+		public function website() {
+	        var u:URLRequest = new URLRequest("http://www.archive.org/details/"+this._SearchResult.identifier);
+	        navigateToURL(u,"_blank");
+
+		}
+      
+	]]>
+</mx:Script>
+<mx:VBox visible="false" id="vbox" left="10" right="10" top="10" bottom="10">
+	<mx:HBox>
+		<mx:Text fontWeight="bold" text="{_SearchResult.title}"/>
+	</mx:HBox>
+	<mx:HBox>
+		<mx:VBox>
+			<mx:Canvas borderColor="black" borderThickness="1" borderStyle="solid" backgroundColor="#F9F9F9" width="126" height="126">
+				<mx:Image width="120" height="120" left="2" top="2" id="image" source="{this._SearchResult.image}"/>
+			</mx:Canvas>
+			<mx:Button width="125" label="artist website" click="website()" />
+		</mx:VBox>
+		<mx:Text htmlText="{_SearchResult.description}" width="350" />
+						
+	</mx:HBox>
+	
+	 <mx:Canvas  width="100%" >
+	 	<local:FileList id="fileList"/>
+	 </mx:Canvas>
+
+</mx:VBox>
+</mx:Canvas>

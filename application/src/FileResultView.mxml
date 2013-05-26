@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*" creationComplete="init()" width="100%">
+	<mx:Script>
+		<![CDATA[
+			import mx.effects.Fade;
+			import mx.events.CollectionEvent;
+			import mx.events.FlexEvent;
+			import mx.containers.VBox;
+			import mx.containers.Accordion;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import com.openplayer.ProfileManager;
+			import com.openplayer.ArchiveManager;
+			import com.openplayer.SearchResult;
+			import com.openplayer.FileResult;
+			import com.openplayer.PlaylistManager;
+			import com.openplayer.Images;
+
+			
+			[Bindable]
+			public var _FileResult:FileResult;
+			
+			[Bindable]
+			public var _SearchResult:SearchResult;
+			
+			
+			public function add() {
+				PlaylistManager._Files.addItem(this._FileResult);
+				this.added.visible = true;		
+			}
+			
+			/*
+			public function remove() {
+				PlaylistManager._Files.removeItemAt(PlaylistManager._Files.getItemIndex(this._FileResult));
+			}
+
+			
+			public function change(event:Event) {
+
+			}
+				*/
+		]]>
+	</mx:Script>
+
+
+	
+	<mx:HBox width="100%">
+		<mx:Text text="{_FileResult.title}" width="200"/>
+		<local:SmallMusicPlayer id="smallMusicPlayer" _FileResult="{_FileResult}"/>
+		<mx:Canvas width="20" height="20">
+			<mx:Image visible="true" source="{Images.list_add}" id="list_add" click="add()" useHandCursor="true" buttonMode="true"/>
+		</mx:Canvas>
+		<local:SongRating/>
+		<mx:Canvas>
+			<mx:Image id="added" source="{Images.added}" visible="false"/>	
+		</mx:Canvas>
+		
+	</mx:HBox>
+</mx:Canvas>

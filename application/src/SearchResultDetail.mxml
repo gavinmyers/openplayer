@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" show="init()" creationComplete="init()"
+	xmlns:local="*"  
+	width="100%">
+	
+	<mx:Script>
+		<![CDATA[
+			import com.openplayer.ApplicationManager;
+			import mx.events.FlexEvent;
+			import mx.containers.VBox;
+			import mx.containers.Accordion;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import com.openplayer.ProfileManager;
+			import com.openplayer.ArchiveManager;
+			import com.openplayer.SearchResult;
+			import com.openplayer.FileResult;
+			
+			[Bindable]
+			public var _SearchResult:SearchResult;
+			
+			[Bindable]
+			public var songCap:int = 15;
+	      
+	      public function init() {
+	      	this.more.htmlText = "";
+	      	this.enabled = false;
+	      	this.fileList.visible = false;
+	      	if(this._SearchResult == null) {
+	      		return;
+	      	}
+	      	var am:ArchiveManager = new ArchiveManager();
+	      	am.listen("DETAIL_RESULT", detailResponse);
+	      	am.details(this._SearchResult);
+	      }
+	      
+			public function detailResponse(event:ResultEvent):void {
+				this.enabled = true;
+
+				var playItems:ArrayCollection = event.result as ArrayCollection;
+				var displayItems:ArrayCollection = new ArrayCollection(playItems.toArray());
+				if(displayItems.length > songCap) {
+					var j:int = displayItems.length;
+					for(var i:int = songCap; i < j; i++) {
+						displayItems.removeItemAt(songCap);
+					}
+					this.more.htmlText = "This band has " + (j - songCap) + " additional song(s) <br/>available in their profile.";
+				}
+				this.fileList.read(this._SearchResult, displayItems);
+				
+				this.fileList.visible = true;
+				
+				this._SearchResult.fileResults = playItems;
+				this._SearchResult.dispatchEvent(new Event("DETAIL_RESULT"));
+			}
+			
+			public function profile() {
+				ApplicationManager._Content.artist._SearchResult = this._SearchResult;
+				ApplicationManager._Content.artistClick();
+				ApplicationManager._Content.artist.init();
+			}
+		]]>
+	</mx:Script>
+	
+<mx:VBox left="10" right="10" top="10" bottom="10">
+	<mx:HBox>
+		<mx:Text fontWeight="bold" text="{_SearchResult.title}" maxWidth="400"/>
+	</mx:HBox>
+	<mx:HBox>
+		<mx:VBox>
+			<mx:Canvas borderColor="black" borderThickness="1" borderStyle="solid" backgroundColor="#F9F9F9" width="126" height="126">
+				<mx:Image width="120" height="120" left="2" top="2" id="image" source="{this._SearchResult.image}"/>
+			</mx:Canvas>
+			<mx:Button width="125" label="view profile" click="profile()"/>
+		</mx:VBox>
+		<mx:Text maxHeight="110" htmlText="{_SearchResult.description}" width="350" />
+						
+	</mx:HBox>
+	
+	 <mx:Canvas  width="100%" >
+	 	<local:FileList id="fileList"/>
+	 </mx:Canvas>
+	 
+	 <mx:Canvas>
+	 	<mx:Text id="more" left="210" maxWidth="250" maxHeight="50" fontStyle="italic"/>	
+	 </mx:Canvas>
+	 
+
+</mx:VBox>
+	
+</mx:Canvas>

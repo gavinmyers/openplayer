@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" xmlns:local="*">
+
+<mx:Script>
+	<![CDATA[
+			import mx.events.IndexChangedEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.containers.VBox;
+			import mx.containers.Accordion;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import com.openplayer.ProfileManager;
+			import com.openplayer.ArchiveManager;
+			import com.openplayer.SearchResult;
+			import mx.managers.PopUpManager;
+			import com.openplayer.Images;
+		
+      		[Bindable]
+      		public var visibleSearchItems:ArrayCollection = new ArrayCollection();
+	]]>
+</mx:Script>
+			 <mx:Canvas verticalScrollPolicy="on" id="rowContainer" height="230" width="100%">
+
+<mx:List rowCount="{visibleSearchItems.length}" 
+	id="list" 
+	width="100%" 
+	backgroundAlpha="0" borderThickness="0" 
+	verticalScrollPolicy="off" 
+	selectable="false" 
+	variableRowHeight="true" 
+	dataProvider="{visibleSearchItems}">
+	
+  <mx:itemRenderer>
+      <mx:Component>
+          <local:SearchResultDetail _SearchResult="{data as SearchResult}"/>
+      </mx:Component>
+  </mx:itemRenderer>
+</mx:List>
+
+		 </mx:Canvas>
+</mx:Canvas>

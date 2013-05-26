@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas initialize="init()" xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" xmlns:local="*">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.IndexChangedEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.containers.VBox;
+			import mx.containers.Accordion;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import com.openplayer.ProfileManager;
+			import com.openplayer.ArchiveManager;
+			import com.openplayer.SearchResult;
+			import mx.managers.PopUpManager;
+			import com.openplayer.Images;
+		
+      		[Bindable]
+      		private var searchItems:ArrayCollection = new ArrayCollection();
+
+      		[Bindable]
+      		private var _ContentSearchDetail:ContentSearchDetail = new ContentSearchDetail();
+      		
+      		public function init():void {
+      			this.container.addChild(this._ContentSearchDetail);
+      		}
+      		
+      		public function search():void {
+      			
+				ArchiveManager.listen("SEARCH_RESULT", searchResponse);
+				ArchiveManager.search(this.searchText.text);
+				this.enabled = false;
+				
+				
+      		}
+      		
+			public function searchResponse(event:ResultEvent):void {
+				this.page = 1;
+				this.start = 0;
+				this.searchItems = event.result as ArrayCollection;
+				this.update();
+			}
+			
+			public var pageLength:int = 5;
+			
+			public function update() {
+				this._ContentSearchDetail.rowContainer.verticalScrollPosition = 0;
+				this.responders = 0;
+				this.respondersHeight = 0;
+				this.enabled = true;
+				this.container.visible = true;
+				this.containerEmpty.visible = false;
+								
+				this._ContentSearchDetail.visibleSearchItems.removeAll();
+				var counter:int = 0;
+				var display:int = 0;
+				var totalSongs:int = 0;
+				for (var i:int = this.start; i < (this.start + this.pageLength); i++) {
+					counter++;
+					if(i >= this.searchItems.length) {
+						break;
+					}
+					var searchItem:SearchResult = this.searchItems.getItemAt(i) as SearchResult;
+					this._ContentSearchDetail.visibleSearchItems.addItem(searchItem);
+					searchItem.addEventListener("DETAIL_RESULT",detailResult);
+				}
+				
+				
+				if(this.searchItems.length > pageLength) {
+					this.pagination.visible = true;
+					this.page_text.text = "page " + this.page + " of " + Math.ceil(this.searchItems.length / pageLength);
+				}
+				
+				
+				
+			}
+			
+			public var responders:int = 0;
+			public var respondersHeight:int = 0;
+			function detailResult(event:Event) {
+				var sr:SearchResult = event.target as SearchResult;
+				this.responders++;
+				var l = sr.fileResults.length;
+				if(l > 16) {
+					l = 17;
+				}
+				this.respondersHeight += (220 + (l * 35));
+				if(this.responders == this._ContentSearchDetail.visibleSearchItems.length) {
+					this._ContentSearchDetail.list.height = this.respondersHeight;
+				}
+
+			}
+			
+            public var start:int = 0;
+            public var page:int = 1;
+            public function next() {
+            	if((this.start + pageLength) > this.searchItems.length) {
+            		return;
+            	}
+            	
+            	this.start = this.start + pageLength;
+            	this.page++;
+            	
+            	this.update();
+            	
+            }
+            
+            public function previous() {
+            	if((this.start - pageLength) < 0) {
+            		return;
+            	}
+
+            	this.start = this.start - pageLength;
+            	this.page--;
+            	
+            	this.update();
+            }
+            
+
+		]]>
+	</mx:Script>
+	<mx:Canvas>
+		 <mx:HBox>
+		 	<mx:TextInput enter="search()" id="searchText" width="578"/>
+		 	<mx:Button label="search" click="search()"/>
+		 </mx:HBox>
+		
+		<mx:Canvas id="container" top="35" width="100%" visible="false">
+		</mx:Canvas>
+		
+		<mx:Canvas id="containerEmpty" borderColor="#E0E0E0" backgroundColor="#000000" backgroundAlpha="0.05" borderStyle="solid" top="35" cornerRadius="8" height="245" width="100%" visible="true">
+			<mx:Text  text="Type in your search criteria to begin."  fontStyle="italic" x="227.5" y="91"/>
+		</mx:Canvas>		
+		
+		
+		 <mx:HBox id="pagination" top="270" left="225" visible="false">
+		 	<mx:Image source="{Images.music_previous}" useHandCursor="true" buttonMode="true" click="previous()"/>
+		 	<mx:Text id="page_text" text="" width="100"/>
+			<mx:Image source="{Images.music_next}" useHandCursor="true" buttonMode="true" click="next()"/>
+		 </mx:HBox>
+	</mx:Canvas>
+</mx:Canvas>

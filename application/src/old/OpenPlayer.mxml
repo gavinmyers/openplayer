@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- http://blog.flexexamples.com/2008/03/29/dynamically-loading-xml-files-using-the-httpservice-tag/ -->
+<mx:Application initialize="init()" xmlns:mx="http://www.adobe.com/2006/mxml"
+        layout="vertical"
+        verticalAlign="middle"
+        backgroundColor="white" viewSourceURL="srcview/index.html" xmlns:local="*">
+
+
+    <mx:Script>
+        <![CDATA[
+            import mx.rpc.events.FaultEvent;
+
+            import mx.collections.ArrayCollection;
+            import mx.rpc.events.ResultEvent;
+            import mx.utils.ObjectUtil;
+            import mx.controls.Alert;
+            import flash.system.Security;
+            import mx.events.MenuEvent;
+            import mx.controls.Menu;
+            import mx.utils.ObjectUtil;
+            
+            // Initialize the Menu control, and specify it as the pop up object
+            // of the PopUpButton control. 
+            private var myMenu:Menu;
+
+            private function initMenu():void {
+                myMenu = new Menu();
+                //myMenu.setStyle("color", 0x000000);
+                myMenu.setStyle("backgroundColor", 0x000000);
+                myMenu.width = popB.width;
+                var dp:Object = [{label: "Play", handler:mp3_player.play},{label: "Pauze", handler:mp3_player.pauze}, {label: "Stop", handler:mp3_player.stop}];        
+                myMenu.dataProvider = dp;
+                myMenu.selectedIndex = 0;       
+                myMenu.addEventListener("itemClick", itemClickHandler);
+                popB.popUp = myMenu;
+                popB.label = "Select actions";//myMenu.dataProvider[myMenu.selectedIndex].label;
+            }
+            
+            // Define the event listener for the Menu control's itemClick event. 
+            private function itemClickHandler(event:MenuEvent):void {
+                popB.label = event.item.label;
+                myMenu.selectedIndex = event.index;
+             
+            }
+
+
+//what... the... fuck
+private function str_replace( replace_with:String, replace:String, original:String ):String
+{
+var array:Array = original.split(replace_with);
+return array.join(replace);
+}
+
+	      [Bindable]
+	      private var searchItems:ArrayCollection;
+	      
+	      [Bindable]
+	      private var playItems:ArrayCollection;
+	      
+	      	var itemURL = "?Action=ITEM&identifier=${identifier}";
+	      	var searchURL = "?Action=SEARCH&query=${query}";
+	      	var fileURL = "http://www.archive.org/download/${identifier}/${file}";
+	      	var cdurl = "http://38.119.107.119/openplayer/post.cfm";
+            private var alert:Alert;
+            
+            private function init() {
+            	itemURL = cdurl + itemURL;
+            	searchURL = cdurl+ searchURL;
+            	this.searchItems = new ArrayCollection();
+            	this.playItems = new ArrayCollection();
+            }
+
+            private function doSearch():void {
+                httpService.url = str_replace("${query}",this.search.text, searchURL);
+                trace(httpService.url);
+                httpService.send();
+            }
+            
+            private function itemchange() {
+            	var sr:SearchResult = this.searchResults.selectedItem as SearchResult;
+                httpItemService.url = str_replace("${identifier}",sr.identifier, itemURL);
+                httpItemService.send();
+            }
+            
+            private function filechange() {
+            	var sr:FileResult = this.nowPlayingGrid.selectedItem as FileResult;
+                this.mp3_player.url = sr.filename;
+                this.mp3_player.stop();
+                this.mp3_player.play();
+            }
+
+            private function httpService_fault(evt:FaultEvent):void {
+                var title:String = evt.type + " (" + evt.fault.faultCode + ")";
+                var text:String = evt.fault.faultString;
+                alert = Alert.show(text, title);
+            }
+
+            private function httpService_result(evt:ResultEvent):void {
+            	searchItems.removeAll();
+                var xmlList:XMLList = XML(evt.result).result.doc;
+	            for each(var item:XML in xmlList) {
+	            	var xmlStr:XMLList = XML(item).str;
+
+	                searchItems.addItem(new SearchResult(
+	                	item.str.(@name == "title"),
+		                item.str.(@name == "description"),
+		                item.str.(@name == "identifier"),
+		                item.float.(@name == "avg_rating")
+		                	)
+	                	);
+	            }
+           }
+            private function httpServiceItem_fault(evt:FaultEvent):void {
+                var title:String = evt.type + " (" + evt.fault.faultCode + ")";
+                var text:String = evt.fault.faultString;
+                alert = Alert.show(text, title);
+            }
+
+            private function httpServiceItem_result(evt:ResultEvent):void {
+            	playItems.removeAll();
+            	var sr:SearchResult = this.searchResults.selectedItem as SearchResult;
+            	
+                var xmlList:XMLList = XML(evt.result).file;
+	            for each(var item:XML in xmlList) {
+	            	var file:String = item.attribute("name");
+	            	if(file.substring(file.length - 3, file.length) == "mp3") {
+	            		var f:String = this.fileURL;
+	            		f = str_replace("${file}",file, f);
+	            		f = str_replace("${identifier}",sr.identifier, f);
+	            		playItems.addItem(new FileResult(f));
+	            	}
+	            }
+                
+            }
+            
+
+        ]]>
+    </mx:Script>
+
+<mx:TextInput id="search"/>
+<mx:Button click="doSearch()"/>
+
+    <mx:HTTPService id="httpService"
+            resultFormat="e4x"
+            fault="httpService_fault(event);"
+            result="httpService_result(event)" />
+            
+    <mx:HTTPService id="httpItemService"
+            resultFormat="e4x"
+            fault="httpServiceItem_fault(event);"
+            result="httpServiceItem_result(event)" />
+            
+  <mx:DataGrid id="searchResults" change="itemchange()" dataProvider="{searchItems}" editable="false"
+    width="100%" height="100%">
+    <mx:columns>
+        <mx:DataGridColumn headerText="Title" dataField="title"/>
+        <mx:DataGridColumn headerText="description" dataField="description"/>
+        <mx:DataGridColumn headerText="identifier" dataField="identifier"/>
+        <mx:DataGridColumn headerText="avg_rating" dataField="avg_rating"/>
+    </mx:columns>
+  </mx:DataGrid>
+  
+  
+    <mx:DataGrid change="filechange()" id="nowPlayingGrid" dataProvider="{playItems}" editable="false" width="100%" height="100%" >
+    <mx:columns>
+        <mx:DataGridColumn headerText="filename" dataField="filename"/>
+    </mx:columns>
+  </mx:DataGrid>
+  
+      <local:MP3Player id="mp3_player" autoPlay="false"/>
+    
+    <mx:PopUpButton id="popB" width="135" creationComplete="initMenu()"/>
+    
+    <mx:Text text="Total length: {mp3_player.sLength}" width="376"/>
+    
+    <mx:Text 
+        id="html_text" 
+        text="Current position: {mp3_player.sPosition}" 
+        width="376" 
+        height="45"/>
+        
+    <mx:HSlider 
+        width="376" 
+        minimum="0" 
+        maximum="{mp3_player.length}" 
+        value="{mp3_player.position}" 
+        toolTip="{}"/>
+        
+    <mx:Text 
+        text="Position in ms: {mp3_player.position}" 
+        width="376"/>
+        
+    <mx:Text 
+        text="Length in ms: {mp3_player.length}" 
+        width="376"/>
+        
+
+
+</mx:Application>

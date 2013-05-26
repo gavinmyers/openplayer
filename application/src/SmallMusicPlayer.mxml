@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+<mx:Script>
+	<![CDATA[
+		import com.openplayer.ApplicationManager;
+		import com.openplayer.MP3Player;
+		import mx.events.FlexEvent;
+		import mx.containers.VBox;
+		import mx.containers.Accordion;
+		import mx.collections.ArrayCollection;
+		import mx.rpc.events.ResultEvent;
+		import com.openplayer.ProfileManager;
+		import com.openplayer.ArchiveManager;
+		import com.openplayer.SearchResult;
+		import com.openplayer.FileResult;
+		import com.openplayer.MP3PlayerManager;
+		import com.openplayer.Images;
+						
+		[Bindable]
+		public var _FileResult:FileResult;
+		
+		[Bindable]
+		public var _MP3Player:MP3Player;
+		
+		[Bindable]
+		public var isDragging:Boolean = false;
+		
+		[Bindable]
+		public var _Timer:Timer = new Timer(1000);
+		
+		public function init() {
+
+			_FileResult.addEventListener("STOP", eventStop);
+			_FileResult.addEventListener("PLAY", eventPlay);
+			
+		}
+		
+		public function stop() {
+
+			MP3PlayerManager.stop();
+		}
+		
+		public function play() {
+
+			if(this._FileResult == null) {
+				return;
+			}
+			
+			_MP3Player = MP3PlayerManager.play(this._FileResult);
+			
+			this.eventPlay(null);
+			
+
+		}
+		
+		public function eventPlay(event:Event) {
+
+			if(MP3PlayerManager.getMP3Player() == null) {
+				return;
+			}	
+			if(_FileResult != MP3PlayerManager.getMP3Player()._FileResult) {
+				return;
+			}
+			this._MP3Player = MP3PlayerManager.getMP3Player();
+
+/*
+			ApplicationManager._Content.artist._SearchResult = this._FileResult._SearchResult;
+			ApplicationManager._Content.artist.init();
+*/			
+			this.istop.visible = true;
+			this.iplay.visible = false;	
+		}
+
+		
+		public function eventStop(event:Event) {
+
+			this.istop.visible = false;
+			this.iplay.visible = true;
+
+		}
+		
+
+
+	]]>
+</mx:Script>
+	<mx:Canvas width="20">
+		<mx:Image id="istop" source="{Images.music_stop}" visible="false" click="stop()" useHandCursor="true" buttonMode="true"/>
+		<mx:Image id="iplay" source="{Images.music_play}" click="play()" useHandCursor="true" buttonMode="true"/>
+	</mx:Canvas>
+</mx:HBox>

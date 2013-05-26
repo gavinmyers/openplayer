@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" initialize="init()" xmlns:local="*">
+	<mx:Script>
+		<![CDATA[
+			import com.openplayer.Images;
+		
+			var mode:String = "SEARCH";
+			
+			public function init():void {
+				this.search.addEventListener("ARTIST_SELECT",searchSelectArtist);
+			}
+			
+			public function playlistClick():void {
+				if(mode == "PLAYLIST") {
+					return;
+				}
+				this.playlist_button.source = Images.tab_on;
+				this.artist_button.source = Images.tab_off;
+				this.search_button.source = Images.tab_off;
+				this.station_button.source = Images.tab_off;
+				this.history_button.source = Images.tab_off;
+				this.history.visible = false;
+				this.playlist.visible = true;
+				this.artist.visible = false;
+				this.search.visible = false;
+				this.station.visible = false;
+				this.mode = "PLAYLIST";
+			}
+			
+			public function artistClick():void {
+				if(mode == "ARTIST") {
+					return;
+				}
+				this.playlist_button.source = Images.tab_off;
+				this.artist_button.source = Images.tab_on;
+				this.search_button.source = Images.tab_off;
+				this.station_button.source = Images.tab_off;
+				this.history_button.source = Images.tab_off;
+				this.history.visible = false;			
+				this.playlist.visible = false;
+				this.artist.visible = true;
+				this.search.visible = false;
+				this.station.visible = false;
+				this.mode = "ARTIST";
+			}
+			
+			public function searchClick():void {
+				if(mode == "SEARCH") {
+					return;
+				}
+				this.playlist_button.source = Images.tab_off;
+				this.artist_button.source = Images.tab_off;
+				this.search_button.source = Images.tab_on;
+				this.station_button.source = Images.tab_off;
+				this.history_button.source = Images.tab_off;
+				this.history.visible = false;
+				this.playlist.visible = false;
+				this.artist.visible = false;
+				this.search.visible = true;
+				this.station.visible = false;
+				this.mode = "SEARCH";
+			}
+			
+			public function stationClick():void {
+				if(mode == "STATION") {
+					return;
+				}
+				this.playlist_button.source = Images.tab_off;
+				this.artist_button.source = Images.tab_off;
+				this.search_button.source = Images.tab_off;
+				this.station_button.source = Images.tab_on;
+				this.history_button.source = Images.tab_off;
+				this.history.visible = false;
+				this.playlist.visible = false;
+				this.artist.visible = false;
+				this.search.visible = false;
+				this.station.visible = true;
+				this.mode = "STATION";
+			}
+			
+			public function historyClick():void {
+				if(mode == "HISTORY") {
+					return;
+				}
+				this.playlist_button.source = Images.tab_off;
+				this.artist_button.source = Images.tab_off;
+				this.search_button.source = Images.tab_off;
+				this.station_button.source = Images.tab_off;
+				this.history_button.source = Images.tab_on;
+				this.history.visible = true;
+				this.playlist.visible = false;
+				this.artist.visible = false;
+				this.search.visible = false;
+				this.station.visible = false;
+				this.mode = "HISTORY";
+			}
+			
+			public function searchSelectArtist(event:Event):void {
+
+			}
+
+		]]>
+	</mx:Script>
+	<mx:VBox>
+		<mx:Canvas>
+			<mx:Canvas height="50" width="140">
+				<mx:Image id="playlist_button" source="{Images.tab_off}" useHandCursor="true" buttonMode="true" click="playlistClick()"/>
+				<mx:Text enabled="false" text="playlist" fontSize="13" color="#999999" top="18" left="15" useHandCursor="true" buttonMode="true" click="playlistClick()"/>
+			</mx:Canvas>
+			<mx:Canvas height="50" width="140" left="130">
+				<mx:Image id="artist_button" source="{Images.tab_off}" useHandCursor="true" buttonMode="true"  click="artistClick()"/>
+				<mx:Text enabled="false" text="artist" fontSize="13" color="#999999" top="18" left="15" useHandCursor="true" buttonMode="true" click="artistClick()"/>
+			</mx:Canvas>
+			<mx:Canvas height="50" width="140" left="260">
+				<mx:Image id="search_button" source="{Images.tab_on}" useHandCursor="true" buttonMode="true"  click="searchClick()"/>
+				<mx:Text enabled="false" text="search" fontSize="13" color="#999999" top="18" left="15" useHandCursor="true" buttonMode="true" click="searchClick()"/>
+			</mx:Canvas>
+			<mx:Canvas height="50" width="140" left="390">
+				<mx:Image id="station_button" source="{Images.tab_off}" useHandCursor="true" buttonMode="true"  click="stationClick()"/>
+				<mx:Text enabled="false" text="stations" fontSize="13" color="#999999" top="18" left="15" useHandCursor="true" buttonMode="true" click="stationClick()"/>
+			</mx:Canvas>
+			<mx:Canvas height="50" width="140" left="520" useHandCursor="true" buttonMode="true" click="historyClick()">
+				<mx:Image id="history_button" source="{Images.tab_off}" useHandCursor="true" buttonMode="true"  click="historyClick()"/>
+				<mx:Text enabled="false" text="history" fontSize="13" color="#999999" top="18" left="15" useHandCursor="true" buttonMode="true" click="stationClick()"/>
+			</mx:Canvas>
+		</mx:Canvas>
+		<mx:Canvas>
+			<local:Playlist visible="false" id="playlist" width="650" height="275" left="10" top="40" verticalScrollPolicy="on"/>
+			
+			<local:ContentArtist visible="false" id="artist" width="650" height="275" left="10" top="40" verticalScrollPolicy="on"/>
+			
+			<local:ContentSearch visible="true" id="search" left="10" top="40"/>
+			
+			<local:ContentStation visible="false" id="station" left="10" top="40"/>
+			
+			<local:ContentHistory visible="false" id="history" left="10" top="40"/>
+		
+		</mx:Canvas>
+	</mx:VBox>
+</mx:Canvas>

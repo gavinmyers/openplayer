@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import com.openplayer.Images;
+
+			
+			public function mouseOver(i:int):void {
+				if(i == 1) {
+					this.star_1.source = Images.star_on;
+					this.star_2.source = Images.star_off;
+					this.star_3.source = Images.star_off;
+					this.star_4.source = Images.star_off;
+					this.star_5.source = Images.star_off;
+				} else if(i == 2) {
+					this.star_1.source = Images.star_on;
+					this.star_2.source = Images.star_on;
+					this.star_3.source = Images.star_off;
+					this.star_4.source = Images.star_off;
+					this.star_5.source = Images.star_off;
+				} else if(i == 3) {
+					this.star_1.source = Images.star_on;
+					this.star_2.source = Images.star_on;
+					this.star_3.source = Images.star_on;
+					this.star_4.source = Images.star_off;
+					this.star_5.source = Images.star_off;
+				} else if(i == 4) {
+					this.star_1.source = Images.star_on;
+					this.star_2.source = Images.star_on;
+					this.star_3.source = Images.star_on;
+					this.star_4.source = Images.star_on;
+					this.star_5.source = Images.star_off;
+				} else if(i == 5) {
+					this.star_1.source = Images.star_on;
+					this.star_2.source = Images.star_on;
+					this.star_3.source = Images.star_on;
+					this.star_4.source = Images.star_on;
+					this.star_5.source = Images.star_on;
+				}
+			}
+			
+			public function mouseOut():void {
+				this.star_1.source = Images.star_off;
+				this.star_2.source = Images.star_off;
+				this.star_3.source = Images.star_off;
+				this.star_4.source = Images.star_off;
+				this.star_5.source = Images.star_off;
+			}
+			
+			
+		]]>
+	</mx:Script>
+	<mx:Canvas>	
+		<mx:Canvas width="16" height="16" left="0"  >
+			<mx:Image width="16" height="16" id="star_1" source="{Images.star_off}" buttonMode="true"  mouseOver="mouseOver(1)" mouseOut="mouseOut()"/>	
+		</mx:Canvas>
+		<mx:Canvas width="16" height="16" left="13" >
+			<mx:Image width="16" height="16" id="star_2" source="{Images.star_off}" buttonMode="true"  mouseOver="mouseOver(2)" mouseOut="mouseOut()" />	
+		</mx:Canvas>
+		<mx:Canvas width="16" height="16" left="26">
+			<mx:Image width="16" height="16"  id="star_3" source="{Images.star_off}" buttonMode="true"  mouseOver="mouseOver(3)" mouseOut="mouseOut()"/>	
+		</mx:Canvas>
+		<mx:Canvas width="16" height="16" left="39">
+			<mx:Image width="16" height="16" id="star_4" source="{Images.star_off}" buttonMode="true"  mouseOver="mouseOver(4)" mouseOut="mouseOut()"/>	
+		</mx:Canvas>
+		<mx:Canvas width="16" height="16" left="52">
+			<mx:Image width="16" height="16" id="star_5" source="{Images.star_off}" buttonMode="true"  mouseOver="mouseOver(5)" mouseOut="mouseOut()"/>	
+		</mx:Canvas>
+	</mx:Canvas>
+	
+</mx:Canvas>

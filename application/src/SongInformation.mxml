@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" initialize="init()" xmlns:local="*">
+	<mx:Script>
+		<![CDATA[
+		import com.openplayer.MP3PlayerManager;
+		import mx.collections.ArrayCollection;
+		import mx.rpc.events.ResultEvent;
+		import com.openplayer.ProfileManager;
+		import com.openplayer.ArchiveManager;
+			      
+	      public function init():void {
+	      	MP3PlayerManager.listen("PLAY", play);
+	      }
+	      public function play(event:Event):void {
+	      	this.song.text = MP3PlayerManager.getMP3Player()._FileResult._SearchResult.title + " - " + MP3PlayerManager.getMP3Player()._FileResult.title;
+	      	this.songrating.visible = true;
+	      }
+		]]>
+	</mx:Script>
+	<mx:Text id="song" color="#BDBDBD" fontSize="14" text="" width="550" height="25"/>
+	<local:SongRating left="605" top="3" visible="false" id="songrating"/>
+</mx:Canvas>
